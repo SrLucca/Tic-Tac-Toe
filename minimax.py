@@ -1,83 +1,72 @@
-def verifica_ganhador(tabuleiro):
-    # Verifica linhas
-    for linha in range(0, 9, 3):
-        if tabuleiro[linha] == tabuleiro[linha + 1] == tabuleiro[linha + 2]:
-            if tabuleiro[linha] + tabuleiro[linha + 1] + tabuleiro[linha + 2] == 3:
-                return 1
-            if tabuleiro[linha] + tabuleiro[linha + 1] + tabuleiro[linha + 2] == -3:
-                return -1
+import random
 
-    # Verifica colunas
-    for coluna in range(3):
-        if tabuleiro[coluna] == tabuleiro[coluna + 3] == tabuleiro[coluna + 6]:
-            if tabuleiro[coluna] + tabuleiro[coluna + 3] + tabuleiro[coluna + 6] == 3:
-                return 1
-            if tabuleiro[coluna] + tabuleiro[coluna + 3] + tabuleiro[coluna + 6] == -3:
-                return -1
 
-    # Verifica diagonais
-    if tabuleiro[0] == tabuleiro[4] == tabuleiro[8] or tabuleiro[2] == tabuleiro[4] == tabuleiro[6]:
-        if tabuleiro[0] + tabuleiro[4] + tabuleiro[8] == 3 or tabuleiro[2] + tabuleiro[4] + tabuleiro[6] == 3:
-            return 1
-        if tabuleiro[0] + tabuleiro[4] + tabuleiro[8] == -3 or tabuleiro[2] + tabuleiro[4] + tabuleiro[6] == -3:
-            return -1
-
+def vitoria(tabuleiro, jogador):
+    # Verifica as linhas, colunas e diagonais
+    for i in range(3):
+        if all([tabuleiro[i][j] == jogador for j in range(3)]) or \
+            all([tabuleiro[j][i] == jogador for j in range(3)]):
+            return True
+    if tabuleiro[0][0] == tabuleiro[1][1] == tabuleiro[2][2] == jogador or \
+        tabuleiro[0][2] == tabuleiro[1][1] == tabuleiro[2][0] == jogador:
+        return True
     return False
 
-def minimax(tabuleiro, profundidade, vez):
-    resultado = verifica_ganhador(tabuleiro)
+def tabuleiro_cheio(tabuleiro):
+    #verifica se todas as linhas e colunas da matriz sao diferentes de ''(vazio)
+    return all([cell != ' ' for row in tabuleiro for cell in row])
 
-    if resultado != False:
-        return resultado
-    
-    if vez == True:
-        maiorScore = -1000
-
-        for x in range(0, 8):
-            if tabuleiro[x] == 0:
-                tabuleiro[x] = 1
-                score = minimax(tabuleiro, profundidade + 1, False)
-                tabuleiro[x] = 0
-                maiorScore = max(score, maiorScore)
-                
-
-        return maiorScore
-
-    else:
-        maiorScore = 1000
-        for x in range(0, 8):
-            if tabuleiro[x] == 0:
-                tabuleiro[x] = -1
-                score = minimax(tabuleiro, profundidade + 1, True)
-                tabuleiro[x] = 0
-                maiorScore = min(score, maiorScore)
-                
-        return maiorScore
-
-def ia_minimax(tabuleiro):
-
-    maiorScore = -1000
-    jogada = 0
-
-    for x in range(0, 8):
-        if tabuleiro[x] == 0:
-            tabuleiro[x] = -1
-
-            score = minimax(tabuleiro, 0, True)
-            tabuleiro[x] = 0
-
-            if score > maiorScore:
-                maiorScore = score
-                jogada = x
-
-    tabuleiro[jogada] = -1
-
-    if verifica_ganhador(tabuleiro) == 1:
-        return 1
-    if verifica_ganhador(tabuleiro) == -1:
+def minimax(tabuleiro, profundidade, jogador):
+    if vitoria(tabuleiro, 'X'):
         return -1
+    if vitoria(tabuleiro, 'O'):
+        return 1
+    if tabuleiro_cheio(tabuleiro):
+        return 0
 
-    print(jogada)
-    print(tabuleiro)
-    return jogada
+    #jogada CPU
+    if jogador == 'O':
+        #valor "infinito" negativo
+        melhor_valor = -float('inf')
 
+        #percorrendo linhas
+        for i in range(3):
+            #percorrendo colunas
+            for j in range(3):
+                #executar jogada se valor no indice [x][y] for vazio ('')
+                if tabuleiro[i][j] == ' ':
+                    tabuleiro[i][j] = 'O'
+                    valor = minimax(tabuleiro, profundidade + 1, 'X')
+                    tabuleiro[i][j] = ' '
+                    melhor_valor = max(melhor_valor, valor)
+        return melhor_valor
+
+    #jogada Jogador
+    else:
+        #valor "infinito" positivo
+        melhor_valor = float('inf')
+        for i in range(3):
+            for j in range(3):
+                if tabuleiro[i][j] == ' ':
+                    tabuleiro[i][j] = 'X'
+                    valor = minimax(tabuleiro, profundidade + 1, 'O')
+                    tabuleiro[i][j] = ' '
+                    melhor_valor = min(melhor_valor, valor)
+        return melhor_valor
+
+def jogada_cpu(tabuleiro):
+    melhor_jogada = None
+    melhor_valor = -float('inf')
+
+    for i in range(3):
+        for j in range(3):
+            if tabuleiro[i][j] == ' ':
+                tabuleiro[i][j] = 'O'
+                valor = minimax(tabuleiro, 0, 'X')
+                tabuleiro[i][j] = ' '
+
+                if valor > melhor_valor:
+                    melhor_valor = valor
+                    melhor_jogada = (i, j)
+
+    return melhor_jogada
