@@ -1,62 +1,65 @@
 import PySimpleGUI as sg
 import random
-import time
-from minimax import ia_minimax
+from minimax import jogada_cpu, vitoria
+
 
 turno = True
-tabuleiro_exemplo = [0,0,0,0,0,0,0,0,0]
-jogada = 0
+tabuleiro = [[' ' for _ in range(3)] for _ in range(3)]
 
 sg.theme('DarkAmber') 
 
 
-layout = [  [sg.Text("Turno:"), sg.Text("Jogador", key="vez")],
-            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='0'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='1'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='2')],
+layout = [  
+            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='00'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='01'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='02')],
 
-            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='3'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='4'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='5')],
+            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='10'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='11'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='12')],
 
-            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='6'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='7'),
-            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='8')]
+            [sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='20'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='21'),
+            sg.Button('', image_filename='quadrado.png', button_color=(sg.theme_background_color(),sg.theme_background_color()),border_width=0, key='22')]
             
             ]
 
 
-window = sg.Window('Tic Tac Toe', layout)
+window = sg.Window('Tic Tac Toe', layout, finalize=True)
 
 while True:
-    
 
     if turno == False:
-        jogada = ia_minimax(tabuleiro_exemplo)
 
-        if jogada == 1:
-            sg.popup("Jogador venceu!")
+        try:
+            linha, coluna = jogada_cpu(tabuleiro)
+        except TypeError:
+            sg.popup("Empate!")
             break
-        if jogada == -1:
-            sg.popup("Maquina venceu!")
-            break
-        else:
-            pass
 
-        window[str(jogada)].update(image_filename='quadrado_marcado_bola.png')
-        tabuleiro_exemplo[int(jogada)] = -1
+        tabuleiro[linha][coluna] = 'O'
+
+        window[f'{linha}{coluna}'].update(image_filename='quadrado_marcado_bola.png')
+        if vitoria(tabuleiro, 'X'):
+            sg.popup("Vitória do Jogador!")
+            break
+        if vitoria(tabuleiro, 'O'):
+            sg.popup("Vitória da CPU!")
+            break
+            
+
         turno = True
-        window['vez'].update('Jogador')
     
 
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == 'Cancel': 
         break
     if event:
+        print(f'Jogador x : {event[0]}')
+        print(f'Jogador y : {event[1]}')
         window[event].update(image_filename='quadrado_marcado.png')
-        tabuleiro_exemplo[int(event)] = 1
+        tabuleiro[int(event[0])][int(event[1])] = "X"
         turno = False
-        window['vez'].update('Maquina')
 
     
     
