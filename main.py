@@ -4,7 +4,8 @@ from minimax import jogada_cpu, vitoria
 
 
 turno = True
-tabuleiro = [[' ' for _ in range(3)] for _ in range(3)]
+tabuleiro = [[' ' for _ in range(3)] for _ in range(3)] #-> #tabuleiro = [['','',''] ['','',''] ['','','']]
+
 
 sg.theme('DarkAmber') 
 
