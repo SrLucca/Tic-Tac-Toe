@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-import random
 from minimax import jogada_cpu, vitoria
 
 
@@ -62,7 +61,5 @@ while True:
         tabuleiro[int(event[0])][int(event[1])] = "X"
         turno = False
 
-    
-    
 
 window.close()
