@@ -35,9 +35,13 @@ def minimax(tabuleiro, profundidade, jogador):
             for j in range(3):
                 #executar jogada se valor no indice [x][y] for vazio ('')
                 if tabuleiro[i][j] == ' ':
+                    #simula jogada sendo o CPU
                     tabuleiro[i][j] = 'O'
+                    #faz chamada recursiva passando o tabuleiro com a jogada feita, aumenta +1 ramo e passa a vez para o jogador(x)
                     valor = minimax(tabuleiro, profundidade + 1, 'X')
+                    #limpa a jogada simulada
                     tabuleiro[i][j] = ' '
+                    #obtem o maior valor entre os negativos entre a jogada anterior e a atual 
                     melhor_valor = max(melhor_valor, valor)
         return melhor_valor
 
@@ -61,10 +65,14 @@ def jogada_cpu(tabuleiro):
     for i in range(3):
         for j in range(3):
             if tabuleiro[i][j] == ' ':
+                #simula jogada da CPU
                 tabuleiro[i][j] = 'O'
+                #primeira chamada recursiva passando o nó raiz(0) e a vez de jogada do Jogador
                 valor = minimax(tabuleiro, 0, 'X')
                 tabuleiro[i][j] = ' '
 
+                #se o valor da jogada obtido depois da recursao for > que o melhor valor obtido, returna as coordenadas
+                #se no cenario atual a CPU for ganhar ou empatar, o valor vai ser 0 ou 1
                 if valor > melhor_valor:
                     melhor_valor = valor
                     melhor_jogada = (i, j)
